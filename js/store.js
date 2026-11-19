@@ -1,7 +1,23 @@
 /**
  * Store & Data Management - Catálogo URBAN MEX
- * Moneda: Soles Peruanos (S/), Precios en 0.00, Sin imágenes por defecto y sincronización total con Admin.
+ * Conectado a Firebase Realtime Database + Caché Instantánea
  */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBMgZ-4QTGUfthjyvdwy8HGf9bXV2Kb1uk",
+  authDomain: "urbanmex.firebaseapp.com",
+  databaseURL: "https://urbanmex-default-rtdb.firebaseio.com",
+  projectId: "urbanmex",
+  storageBucket: "urbanmex.firebasestorage.app",
+  messagingSenderId: "960274209417",
+  appId: "1:960274209417:web:faff9ae40b7614d0de0458"
+};
+
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const db = typeof firebase !== 'undefined' ? firebase.database() : null;
 
 const STORAGE_KEYS = {
   SETTINGS: 'catalogomata_settings_v6',
@@ -99,14 +115,63 @@ const INITIAL_PRODUCTS = [
   }
 ];
 
+let _cloudReady = false;
+
 const Store = {
+  initCloudSync() {
+    if (!db) return;
+
+    // 1. Escuchar Configuración en tiempo real
+    db.ref('urbanmex/settings').on('value', (snap) => {
+      const val = snap.val();
+      if (val) {
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...INITIAL_SETTINGS, ...val }));
+        this._triggerUIUpdate();
+      } else {
+        db.ref('urbanmex/settings').set(INITIAL_SETTINGS);
+      }
+    });
+
+    // 2. Escuchar Marcas en tiempo real
+    db.ref('urbanmex/brands').on('value', (snap) => {
+      const val = snap.val();
+      if (val && Array.isArray(val)) {
+        localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(val));
+        this._triggerUIUpdate();
+      } else {
+        db.ref('urbanmex/brands').set(INITIAL_BRANDS);
+      }
+    });
+
+    // 3. Escuchar Productos en tiempo real
+    db.ref('urbanmex/products').on('value', (snap) => {
+      const val = snap.val();
+      if (val !== null) {
+        const list = Array.isArray(val) ? val.filter(Boolean) : Object.values(val);
+        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
+        this._triggerUIUpdate();
+      } else if (!_cloudReady) {
+        db.ref('urbanmex/products').set(INITIAL_PRODUCTS);
+      }
+      _cloudReady = true;
+    });
+  },
+
+  _triggerUIUpdate() {
+    window.dispatchEvent(new Event('storage'));
+    if (typeof window.renderCatalog === 'function') window.renderCatalog();
+    if (typeof window.initApp === 'function' && !window._appInitialized) {
+      window._appInitialized = true;
+      window.initApp();
+    }
+  },
+
   getSettings() {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (data) {
         return { ...INITIAL_SETTINGS, ...JSON.parse(data) };
       }
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(INITIAL_SETTINGS));
       return { ...INITIAL_SETTINGS };
     } catch (e) {
       return { ...INITIAL_SETTINGS };
@@ -117,16 +182,14 @@ const Store = {
     const current = this.getSettings();
     const updated = { ...current, ...newSettings };
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updated));
+    if (db) db.ref('urbanmex/settings').set(updated);
     return updated;
   },
 
   getBrands() {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.BRANDS);
-      if (data) {
-        return JSON.parse(data);
-      }
-      localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(INITIAL_BRANDS));
+      if (data) return JSON.parse(data);
       return [...INITIAL_BRANDS];
     } catch (e) {
       return [...INITIAL_BRANDS];
@@ -135,6 +198,7 @@ const Store = {
 
   saveBrands(brands) {
     localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(brands));
+    if (db) db.ref('urbanmex/brands').set(brands);
   },
 
   addBrand(brandName) {
@@ -161,10 +225,7 @@ const Store = {
   getProducts() {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      if (data) {
-        return JSON.parse(data);
-      }
-      this.saveProducts(INITIAL_PRODUCTS);
+      if (data) return JSON.parse(data);
       return [...INITIAL_PRODUCTS];
     } catch (e) {
       return [...INITIAL_PRODUCTS];
@@ -173,6 +234,7 @@ const Store = {
 
   saveProducts(products) {
     localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+    if (db) db.ref('urbanmex/products').set(products);
   },
 
   getProductById(id) {
@@ -232,9 +294,9 @@ const Store = {
   },
 
   resetToDefaults() {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(INITIAL_SETTINGS));
-    localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(INITIAL_BRANDS));
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+    this.saveSettings(INITIAL_SETTINGS);
+    this.saveBrands(INITIAL_BRANDS);
+    this.saveProducts(INITIAL_PRODUCTS);
   },
 
   isAdminAuthenticated() {
@@ -254,7 +316,7 @@ const Store = {
     sessionStorage.removeItem(STORAGE_KEYS.AUTH);
   },
 
-  compressImage(file, maxWidth = 900, maxHeight = 900, quality = 0.82) {
+  compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.78) {
     return new Promise((resolve, reject) => {
       if (!file) return resolve('');
 
@@ -330,3 +392,4 @@ const Store = {
 };
 
 window.Store = Store;
+Store.initCloudSync();
