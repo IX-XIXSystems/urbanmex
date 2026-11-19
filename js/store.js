@@ -381,6 +381,427 @@ const Store = {
       description: (productData.description !== undefined ? productData.description : products[index].description).trim(),
       image: productData.image !== undefined ? productData.image : products[index].image,
       updatedAt: Date.now()
+/**
+ * Store & Data Management - Catálogo URBAN MEX
+ * Sincronizado en tiempo real con Firebase Realtime Database
+ */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBMgZ-4QTGUfthjyvdwy8HGf9bXV2Kb1uk",
+  authDomain: "urbanmex.firebaseapp.com",
+  databaseURL: "https://urbanmex-default-rtdb.firebaseio.com",
+  projectId: "urbanmex",
+  storageBucket: "urbanmex.firebasestorage.app",
+  messagingSenderId: "960274209417",
+  appId: "1:960274209417:web:faff9ae40b7614d0de0458"
+};
+
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const db = typeof firebase !== 'undefined' ? firebase.database() : null;
+
+const STORAGE_KEYS = {
+  SETTINGS: 'catalogomata_settings_v6',
+  CATEGORIES: 'catalogomata_categories_v6',
+  BRANDS: 'catalogomata_brands_v6',
+  PRODUCTS: 'catalogomata_products_v6',
+  AUTH: 'catalogomata_admin_session_v6'
+};
+
+const DEFAULT_WHATSAPP = '51931986950';
+
+const INITIAL_SETTINGS = {
+  storeName: 'URBAN MEX',
+  tagline: 'Te lo hacen realidad!',
+  logoUrl: 'assets/logo.png',
+  whatsapp: DEFAULT_WHATSAPP,
+  currency: 'S/ ',
+  adminPin: '1234'
+};
+
+const INITIAL_CATEGORIES = [
+  { id: 'brand', name: 'Por Marca', hasBrands: true, banner: '' },
+  { id: 'custom', name: 'Personalizadas', hasBrands: false, banner: 'Diseños a tu medida: Estampamos tu propio arte o idea. Toca cualquier modelo para cotizar por WhatsApp.' }
+];
+
+const INITIAL_BRANDS = [
+  'Adidas',
+  'Nike',
+  'Supreme',
+  'Jordan'
+];
+
+const INITIAL_PRODUCTS = [
+  {
+    id: 'prod_1',
+    name: 'Camisa 1',
+    brand: 'Personalizada',
+    category: 'custom',
+    price: 0.00,
+    description: 'Tallas: S, M, L, XL, XXL • Algodón 240g heavy drop.',
+    image: '',
+    createdAt: Date.now() - 700000
+  },
+  {
+    id: 'prod_2',
+    name: 'Camisa 2',
+    brand: 'Adidas',
+    category: 'brand',
+    price: 0.00,
+    description: 'Tallas: S, M, L, XL • 100% Algodón peinado negro • Ajuste regular fit.',
+    image: '',
+    createdAt: Date.now() - 600000
+  },
+  {
+    id: 'prod_3',
+    name: 'Camisa 3',
+    brand: 'Nike',
+    category: 'brand',
+    price: 0.00,
+    description: 'Tallas: S, M, L, XL • Algodón Dri-FIT 220 GSM.',
+    image: '',
+    createdAt: Date.now() - 500000
+  },
+  {
+    id: 'prod_4',
+    name: 'Camisa 4',
+    brand: 'Adidas',
+    category: 'brand',
+    price: 0.00,
+    description: 'Tallas: M, L, XL • Microfibra deportiva ultra ligera.',
+    image: '',
+    createdAt: Date.now() - 400000
+  },
+  {
+    id: 'prod_5',
+    name: 'Camisa 5',
+    brand: 'Nike',
+    category: 'brand',
+    price: 0.00,
+    description: 'Tallas: S, M, L, XL, XXL • Algodón estructurado 240 GSM.',
+    image: '',
+    createdAt: Date.now() - 300000
+  },
+  {
+    id: 'prod_6',
+    name: 'Camisa 6',
+    brand: 'Personalizada',
+    category: 'custom',
+    price: 0.00,
+    description: 'Tallas: M, L, XL • Personalizable con tu diseño a pedido.',
+    image: '',
+    createdAt: Date.now() - 200000
+  },
+  {
+    id: 'prod_7',
+    name: 'Camisa 7',
+    brand: 'Personalizada',
+    category: 'custom',
+    price: 0.00,
+    description: 'Tallas: S, M, L, XL • 100% algodón peinado negro 240g.',
+    image: '',
+    createdAt: Date.now() - 100000
+  }
+];
+
+function normalizePhone(raw) {
+  let digits = String(raw || '').replace(/[^0-9]/g, '');
+  if (digits.length === 9 && digits.startsWith('9')) {
+    digits = '51' + digits;
+  }
+  return digits || DEFAULT_WHATSAPP;
+}
+
+const Store = {
+  initCloudSync() {
+    if (!db) return;
+
+    db.ref('urbanmex/initialized').once('value', (initSnap) => {
+      const isInit = initSnap.val() === true;
+
+      db.ref('urbanmex/settings').on('value', (snap) => {
+        const val = snap.val();
+        if (val) {
+          const oldPlaceholders = ['51900000000', '521000000000', ''];
+          const currentPhone = String(val.whatsapp || '').replace(/[^0-9]/g, '');
+
+          if (oldPlaceholders.includes(currentPhone)) {
+            const migrated = { ...INITIAL_SETTINGS, ...val, whatsapp: DEFAULT_WHATSAPP };
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(migrated));
+            db.ref('urbanmex/settings').set(migrated);
+          } else {
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...INITIAL_SETTINGS, ...val }));
+          }
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/settings').set(INITIAL_SETTINGS);
+        }
+      });
+
+      db.ref('urbanmex/categories').on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val) && val.length > 0) {
+          localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(val));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/categories').set(INITIAL_CATEGORIES);
+        }
+      });
+
+      db.ref('urbanmex/brands').on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val)) {
+          localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(val));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/brands').set(INITIAL_BRANDS);
+        }
+      });
+
+      db.ref('urbanmex/products').on('value', (snap) => {
+        const val = snap.val();
+        if (val !== null) {
+          const list = Array.isArray(val) ? val.filter(Boolean) : Object.values(val);
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/products').set(INITIAL_PRODUCTS);
+        } else {
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify([]));
+          this._notifySync();
+        }
+      });
+
+      if (!isInit) {
+        db.ref('urbanmex/initialized').set(true);
+      }
+    });
+  },
+
+  _notifySync() {
+    window.dispatchEvent(new CustomEvent('urbanmex:sync'));
+  },
+
+  getSettings() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+      if (data) {
+        const parsed = JSON.parse(data);
+        return {
+          ...INITIAL_SETTINGS,
+          ...parsed,
+          whatsapp: normalizePhone(parsed.whatsapp || DEFAULT_WHATSAPP)
+        };
+      }
+      return { ...INITIAL_SETTINGS };
+    } catch (e) {
+      return { ...INITIAL_SETTINGS };
+    }
+  },
+
+  saveSettings(newSettings) {
+    const current = this.getSettings();
+    const cleanPhone = newSettings.whatsapp !== undefined
+      ? normalizePhone(newSettings.whatsapp)
+      : current.whatsapp;
+
+    const updated = {
+      ...current,
+      ...newSettings,
+      whatsapp: cleanPhone
+    };
+
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updated));
+    this._notifySync();
+
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      return db.ref('urbanmex/settings').set(updated).then(() => updated);
+    }
+    return Promise.resolve(updated);
+  },
+
+  getCategories() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return [...INITIAL_CATEGORIES];
+    } catch (e) {
+      return [...INITIAL_CATEGORIES];
+    }
+  },
+
+  saveCategories(categories) {
+    localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/categories').set(categories);
+    }
+    this._notifySync();
+  },
+
+  addCategory(name, banner = '', hasBrands = false) {
+    const cleanName = (name || '').trim();
+    if (!cleanName) return { success: false, error: 'Escribe el nombre del apartado.' };
+
+    const categories = this.getCategories();
+    if (categories.some(c => c.name.toLowerCase() === cleanName.toLowerCase())) {
+      return { success: false, error: 'Este apartado ya existe.' };
+    }
+
+    const slug = 'cat_' + cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString().slice(-4);
+    const newCat = {
+      id: slug,
+      name: cleanName,
+      hasBrands: Boolean(hasBrands),
+      banner: (banner || '').trim()
+    };
+
+    categories.push(newCat);
+    this.saveCategories(categories);
+    return { success: true, category: newCat, categories };
+  },
+
+  updateCategory(catId, newName) {
+    const cleanName = (newName || '').trim();
+    if (!cleanName) return { success: false, error: 'El nombre no puede estar vacío.' };
+
+    const categories = this.getCategories();
+    const index = categories.findIndex(c => c.id === catId);
+    if (index === -1) return { success: false, error: 'Apartado no encontrado.' };
+
+    categories[index].name = cleanName;
+    this.saveCategories(categories);
+    return { success: true, category: categories[index] };
+  },
+
+  deleteCategory(catId) {
+    const current = this.getCategories();
+    if (current.length <= 1) return { success: false, error: 'Debe quedar al menos un apartado.' };
+    const categories = current.filter(c => c.id !== catId);
+    this.saveCategories(categories);
+    return { success: true, categories };
+  },
+
+  getCategoryById(catId) {
+    return this.getCategories().find(c => c.id === catId) || null;
+  },
+
+  getBrands() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.BRANDS);
+      return data ? JSON.parse(data) : [...INITIAL_BRANDS];
+    } catch (e) {
+      return [...INITIAL_BRANDS];
+    }
+  },
+
+  saveBrands(brands) {
+    localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(brands));
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/brands').set(brands);
+    }
+    this._notifySync();
+  },
+
+  addBrand(brandName) {
+    const cleanName = (brandName || '').trim();
+    if (!cleanName) return { success: false, error: 'El nombre de la marca no puede estar vacío.' };
+
+    const brands = this.getBrands();
+    if (brands.some(b => b.toLowerCase() === cleanName.toLowerCase())) {
+      return { success: false, error: 'Esta marca ya existe en el catálogo.' };
+    }
+
+    brands.push(cleanName);
+    this.saveBrands(brands);
+    return { success: true, brand: cleanName, brands };
+  },
+
+  deleteBrand(brandName) {
+    const brands = this.getBrands().filter(b => b.toLowerCase() !== brandName.toLowerCase());
+    this.saveBrands(brands);
+    return brands;
+  },
+
+  getProducts() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+      return data ? JSON.parse(data) : [...INITIAL_PRODUCTS];
+    } catch (e) {
+      return [...INITIAL_PRODUCTS];
+    }
+  },
+
+  saveProducts(products) {
+    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/products').set(products);
+    }
+    this._notifySync();
+  },
+
+  getProductById(id) {
+    return this.getProducts().find(p => p.id === id) || null;
+  },
+
+  addProduct(productData) {
+    const products = this.getProducts();
+    const nextNum = products.length + 1;
+    const rawPrice = parseFloat(productData.price);
+    const validPrice = !isNaN(rawPrice) && rawPrice >= 0 ? rawPrice : 0;
+
+    const catObj = this.getCategoryById(productData.category);
+    const displayBrand = (catObj && catObj.hasBrands)
+      ? (productData.brand || 'General').trim()
+      : (catObj ? catObj.name : 'Personalizada');
+
+    const newProduct = {
+      id: 'prod_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+      name: (productData.name || `Producto ${nextNum}`).trim(),
+      brand: displayBrand,
+      category: productData.category || 'brand',
+      price: validPrice,
+      description: (productData.description || '').trim(),
+      image: (productData.image || '').trim(),
+      createdAt: Date.now()
+    };
+
+    products.push(newProduct);
+    this.saveProducts(products);
+    return newProduct;
+  },
+
+  updateProduct(id, productData) {
+    const products = this.getProducts();
+    const index = products.findIndex(p => p.id === id);
+    if (index === -1) return null;
+
+    const rawPrice = parseFloat(productData.price);
+    const validPrice = !isNaN(rawPrice) && rawPrice >= 0 ? rawPrice : products[index].price;
+    const targetCat = productData.category || products[index].category;
+    const catObj = this.getCategoryById(targetCat);
+
+    const displayBrand = (catObj && catObj.hasBrands)
+      ? (productData.brand || products[index].brand).trim()
+      : (catObj ? catObj.name : 'Personalizada');
+
+    products[index] = {
+      ...products[index],
+      name: (productData.name !== undefined ? productData.name : products[index].name).trim(),
+      brand: displayBrand,
+      category: targetCat,
+      price: validPrice,
+      description: (productData.description !== undefined ? productData.description : products[index].description).trim(),
+      image: productData.image !== undefined ? productData.image : products[index].image,
+      updatedAt: Date.now()
     };
 
     this.saveProducts(products);
@@ -466,8 +887,7 @@ const Store = {
 
   getWhatsAppLink(product) {
     const settings = this.getSettings();
-    let phone = (settings.whatsapp || '').replace(/[^0-9]/g, '');
-    if (!phone) phone = '51900000000';
+    const phone = normalizePhone(settings.whatsapp);
 
     const catObj = this.getCategoryById(product.category);
     const brandText = (catObj && catObj.hasBrands) ? product.brand : (catObj ? catObj.name : product.brand);
