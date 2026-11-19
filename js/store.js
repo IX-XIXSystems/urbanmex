@@ -1,6 +1,6 @@
 /**
  * Store & Data Management - Catálogo URBAN MEX
- * Conectado a Firebase Realtime Database + Caché Instantánea
+ * Sincronizado en tiempo real con Firebase Realtime Database
  */
 
 const firebaseConfig = {
@@ -21,6 +21,7 @@ const db = typeof firebase !== 'undefined' ? firebase.database() : null;
 
 const STORAGE_KEYS = {
   SETTINGS: 'catalogomata_settings_v6',
+  CATEGORIES: 'catalogomata_categories_v6',
   BRANDS: 'catalogomata_brands_v6',
   PRODUCTS: 'catalogomata_products_v6',
   AUTH: 'catalogomata_admin_session_v6'
@@ -34,6 +35,11 @@ const INITIAL_SETTINGS = {
   currency: 'S/ ',
   adminPin: '1234'
 };
+
+const INITIAL_CATEGORIES = [
+  { id: 'brand', name: 'Por Marca', hasBrands: true, banner: '' },
+  { id: 'custom', name: 'Personalizadas', hasBrands: false, banner: 'Diseños a tu medida: Estampamos tu propio arte o idea. Toca cualquier modelo para cotizar por WhatsApp.' }
+];
 
 const INITIAL_BRANDS = [
   'Adidas',
@@ -115,82 +121,160 @@ const INITIAL_PRODUCTS = [
   }
 ];
 
-let _cloudReady = false;
-
 const Store = {
   initCloudSync() {
     if (!db) return;
 
-    // 1. Escuchar Configuración en tiempo real
-    db.ref('urbanmex/settings').on('value', (snap) => {
-      const val = snap.val();
-      if (val) {
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...INITIAL_SETTINGS, ...val }));
-        this._triggerUIUpdate();
-      } else {
-        db.ref('urbanmex/settings').set(INITIAL_SETTINGS);
-      }
-    });
+    db.ref('urbanmex/initialized').once('value', (initSnap) => {
+      const isInit = initSnap.val() === true;
 
-    // 2. Escuchar Marcas en tiempo real
-    db.ref('urbanmex/brands').on('value', (snap) => {
-      const val = snap.val();
-      if (val && Array.isArray(val)) {
-        localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(val));
-        this._triggerUIUpdate();
-      } else {
-        db.ref('urbanmex/brands').set(INITIAL_BRANDS);
-      }
-    });
+      db.ref('urbanmex/settings').on('value', (snap) => {
+        const val = snap.val();
+        if (val) {
+          localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...INITIAL_SETTINGS, ...val }));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/settings').set(INITIAL_SETTINGS);
+        }
+      });
 
-    // 3. Escuchar Productos en tiempo real
-    db.ref('urbanmex/products').on('value', (snap) => {
-      const val = snap.val();
-      if (val !== null) {
-        const list = Array.isArray(val) ? val.filter(Boolean) : Object.values(val);
-        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
-        this._triggerUIUpdate();
-      } else if (!_cloudReady) {
-        db.ref('urbanmex/products').set(INITIAL_PRODUCTS);
+      db.ref('urbanmex/categories').on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val) && val.length > 0) {
+          localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(val));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/categories').set(INITIAL_CATEGORIES);
+        }
+      });
+
+      db.ref('urbanmex/brands').on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val)) {
+          localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(val));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/brands').set(INITIAL_BRANDS);
+        }
+      });
+
+      db.ref('urbanmex/products').on('value', (snap) => {
+        const val = snap.val();
+        if (val !== null) {
+          const list = Array.isArray(val) ? val.filter(Boolean) : Object.values(val);
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
+          this._notifySync();
+        } else if (!isInit) {
+          db.ref('urbanmex/products').set(INITIAL_PRODUCTS);
+        } else {
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify([]));
+          this._notifySync();
+        }
+      });
+
+      if (!isInit) {
+        db.ref('urbanmex/initialized').set(true);
       }
-      _cloudReady = true;
     });
   },
 
-  _triggerUIUpdate() {
-    window.dispatchEvent(new Event('storage'));
-    if (typeof window.renderCatalog === 'function') window.renderCatalog();
-    if (typeof window.initApp === 'function' && !window._appInitialized) {
-      window._appInitialized = true;
-      window.initApp();
-    }
+  _notifySync() {
+    window.dispatchEvent(new CustomEvent('urbanmex:sync'));
   },
 
   getSettings() {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      if (data) {
-        return { ...INITIAL_SETTINGS, ...JSON.parse(data) };
-      }
-      return { ...INITIAL_SETTINGS };
+      return data ? { ...INITIAL_SETTINGS, ...JSON.parse(data) } : { ...INITIAL_SETTINGS };
     } catch (e) {
       return { ...INITIAL_SETTINGS };
     }
   },
 
   saveSettings(newSettings) {
-    const current = this.getSettings();
-    const updated = { ...current, ...newSettings };
+    const updated = { ...this.getSettings(), ...newSettings };
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updated));
-    if (db) db.ref('urbanmex/settings').set(updated);
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/settings').set(updated);
+    }
+    this._notifySync();
     return updated;
+  },
+
+  getCategories() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return [...INITIAL_CATEGORIES];
+    } catch (e) {
+      return [...INITIAL_CATEGORIES];
+    }
+  },
+
+  saveCategories(categories) {
+    localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/categories').set(categories);
+    }
+    this._notifySync();
+  },
+
+  addCategory(name, banner = '', hasBrands = false) {
+    const cleanName = (name || '').trim();
+    if (!cleanName) return { success: false, error: 'Escribe el nombre del apartado.' };
+
+    const categories = this.getCategories();
+    if (categories.some(c => c.name.toLowerCase() === cleanName.toLowerCase())) {
+      return { success: false, error: 'Este apartado ya existe.' };
+    }
+
+    const slug = 'cat_' + cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString().slice(-4);
+    const newCat = {
+      id: slug,
+      name: cleanName,
+      hasBrands: Boolean(hasBrands),
+      banner: (banner || '').trim()
+    };
+
+    categories.push(newCat);
+    this.saveCategories(categories);
+    return { success: true, category: newCat, categories };
+  },
+
+  updateCategory(catId, newName) {
+    const cleanName = (newName || '').trim();
+    if (!cleanName) return { success: false, error: 'El nombre no puede estar vacío.' };
+
+    const categories = this.getCategories();
+    const index = categories.findIndex(c => c.id === catId);
+    if (index === -1) return { success: false, error: 'Apartado no encontrado.' };
+
+    categories[index].name = cleanName;
+    this.saveCategories(categories);
+    return { success: true, category: categories[index] };
+  },
+
+  deleteCategory(catId) {
+    const current = this.getCategories();
+    if (current.length <= 1) return { success: false, error: 'Debe quedar al menos un apartado.' };
+    const categories = current.filter(c => c.id !== catId);
+    this.saveCategories(categories);
+    return { success: true, categories };
+  },
+
+  getCategoryById(catId) {
+    return this.getCategories().find(c => c.id === catId) || null;
   },
 
   getBrands() {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.BRANDS);
-      if (data) return JSON.parse(data);
-      return [...INITIAL_BRANDS];
+      return data ? JSON.parse(data) : [...INITIAL_BRANDS];
     } catch (e) {
       return [...INITIAL_BRANDS];
     }
@@ -198,7 +282,11 @@ const Store = {
 
   saveBrands(brands) {
     localStorage.setItem(STORAGE_KEYS.BRANDS, JSON.stringify(brands));
-    if (db) db.ref('urbanmex/brands').set(brands);
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/brands').set(brands);
+    }
+    this._notifySync();
   },
 
   addBrand(brandName) {
@@ -206,8 +294,7 @@ const Store = {
     if (!cleanName) return { success: false, error: 'El nombre de la marca no puede estar vacío.' };
 
     const brands = this.getBrands();
-    const exists = brands.some(b => b.toLowerCase() === cleanName.toLowerCase());
-    if (exists) {
+    if (brands.some(b => b.toLowerCase() === cleanName.toLowerCase())) {
       return { success: false, error: 'Esta marca ya existe en el catálogo.' };
     }
 
@@ -225,8 +312,7 @@ const Store = {
   getProducts() {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      if (data) return JSON.parse(data);
-      return [...INITIAL_PRODUCTS];
+      return data ? JSON.parse(data) : [...INITIAL_PRODUCTS];
     } catch (e) {
       return [...INITIAL_PRODUCTS];
     }
@@ -234,12 +320,15 @@ const Store = {
 
   saveProducts(products) {
     localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-    if (db) db.ref('urbanmex/products').set(products);
+    if (db) {
+      db.ref('urbanmex/initialized').set(true);
+      db.ref('urbanmex/products').set(products);
+    }
+    this._notifySync();
   },
 
   getProductById(id) {
-    const products = this.getProducts();
-    return products.find(p => p.id === id) || null;
+    return this.getProducts().find(p => p.id === id) || null;
   },
 
   addProduct(productData) {
@@ -248,10 +337,15 @@ const Store = {
     const rawPrice = parseFloat(productData.price);
     const validPrice = !isNaN(rawPrice) && rawPrice >= 0 ? rawPrice : 0;
 
+    const catObj = this.getCategoryById(productData.category);
+    const displayBrand = (catObj && catObj.hasBrands)
+      ? (productData.brand || 'General').trim()
+      : (catObj ? catObj.name : 'Personalizada');
+
     const newProduct = {
       id: 'prod_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
-      name: (productData.name || `Camisa ${nextNum}`).trim(),
-      brand: productData.category === 'custom' ? 'Personalizada' : (productData.brand || 'General').trim(),
+      name: (productData.name || `Producto ${nextNum}`).trim(),
+      brand: displayBrand,
       category: productData.category || 'brand',
       price: validPrice,
       description: (productData.description || '').trim(),
@@ -271,12 +365,18 @@ const Store = {
 
     const rawPrice = parseFloat(productData.price);
     const validPrice = !isNaN(rawPrice) && rawPrice >= 0 ? rawPrice : products[index].price;
+    const targetCat = productData.category || products[index].category;
+    const catObj = this.getCategoryById(targetCat);
+
+    const displayBrand = (catObj && catObj.hasBrands)
+      ? (productData.brand || products[index].brand).trim()
+      : (catObj ? catObj.name : 'Personalizada');
 
     products[index] = {
       ...products[index],
       name: (productData.name !== undefined ? productData.name : products[index].name).trim(),
-      brand: productData.category === 'custom' ? 'Personalizada' : (productData.brand || products[index].brand).trim(),
-      category: productData.category || products[index].category,
+      brand: displayBrand,
+      category: targetCat,
       price: validPrice,
       description: (productData.description !== undefined ? productData.description : products[index].description).trim(),
       image: productData.image !== undefined ? productData.image : products[index].image,
@@ -295,6 +395,7 @@ const Store = {
 
   resetToDefaults() {
     this.saveSettings(INITIAL_SETTINGS);
+    this.saveCategories(INITIAL_CATEGORIES);
     this.saveBrands(INITIAL_BRANDS);
     this.saveProducts(INITIAL_PRODUCTS);
   },
@@ -359,7 +460,8 @@ const Store = {
   },
 
   getDefaultImagePlaceholder() {
-    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750"><rect width="100%" height="100%" fill="%230b0b0f"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="%2352525b" letter-spacing="3">SIN IMAGEN</text></svg>`;
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='750' viewBox='0 0 600 750'><rect width='100%' height='100%' fill='#0b0b0f'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' font-weight='600' fill='#52525b' letter-spacing='4'>SIN IMAGEN</text></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   },
 
   getWhatsAppLink(product) {
@@ -367,15 +469,16 @@ const Store = {
     let phone = (settings.whatsapp || '').replace(/[^0-9]/g, '');
     if (!phone) phone = '51900000000';
 
-    const brandText = product.category === 'custom' ? 'Personalizada' : product.brand;
+    const catObj = this.getCategoryById(product.category);
+    const brandText = (catObj && catObj.hasBrands) ? product.brand : (catObj ? catObj.name : product.brand);
     const priceText = this.formatPrice(product.price);
 
-    const message = `🔥 ¡Hola *${settings.storeName}*! Me interesa pedir esta camisa del catálogo:
+    const message = `🔥 ¡Hola *${settings.storeName}*! Me interesa pedir este producto del catálogo:
 
-👕 *${product.name}*
-🏷️ *Marca/Tipo:* ${brandText}
+🛍️ *${product.name}*
+🏷️ *Apartado/Marca:* ${brandText}
 💰 *Precio:* ${priceText}
-📝 *Detalles:* ${product.description || 'Consultar tallas'}
+📝 *Detalles:* ${product.description || 'Consultar disponibilidad'}
 
 ¿Tienen disponibilidad para coordinar el pedido?`;
 
