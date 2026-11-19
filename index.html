@@ -8,18 +8,16 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="format-detection" content="telephone=no">
   <meta name="description"
-    content="URBAN MEX — Te lo hacen realidad. Catálogo exclusivo de camisas por marca y personalizadas.">
+    content="URBAN MEX — Te lo hacen realidad. Catálogo exclusivo por marca, personalizados y accesorios.">
   <meta name="theme-color" content="#040406">
   <title>URBAN MEX | Te Lo Hacen Realidad</title>
 
-  <!-- ══════════════════════════════════════════════════
-       BANNER PARA WHATSAPP (CON .JPEG)
-       ══════════════════════════════════════════════════ -->
+  <!-- BANNER PARA WHATSAPP -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ix-xixsystems.github.io/urbanmex/">
   <meta property="og:site_name" content="URBAN MEX">
   <meta property="og:title" content="URBAN MEX | Te Lo Hacen Realidad">
-  <meta property="og:description" content="Catálogo oficial de camisas por marca y diseños personalizados a tu medida.">
+  <meta property="og:description" content="Catálogo oficial por marca y diseños personalizados a tu medida.">
   <meta property="og:image" content="https://ix-xixsystems.github.io/urbanmex/banner.jpeg">
   <meta property="og:image:secure_url" content="https://ix-xixsystems.github.io/urbanmex/banner.jpeg">
   <meta property="og:image:type" content="image/jpeg">
@@ -27,8 +25,7 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="URBAN MEX | Te Lo Hacen Realidad">
-  <meta name="twitter:description"
-    content="Catálogo oficial de camisas por marca y diseños personalizados a tu medida.">
+  <meta name="twitter:description" content="Catálogo oficial por marca y diseños personalizados a tu medida.">
   <meta name="twitter:image" content="https://ix-xixsystems.github.io/urbanmex/banner.jpeg">
 
   <link rel="icon" type="image/png" href="assets/logo.png">
@@ -39,11 +36,78 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Mantiene el estilo exacto de las pestañas sin importar cuántas crees -->
+  <style>
+    .segmented-control {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      flex-wrap: wrap !important;
+      gap: 28px !important;
+      width: 100% !important;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      border-radius: 0 !important;
+      padding: 0 12px !important;
+    }
+
+    .segmented-control .segment-btn {
+      position: relative !important;
+      flex: 0 0 auto !important;
+      width: auto !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 12px 4px !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.1em !important;
+      color: #71717a !important;
+      cursor: pointer !important;
+      transition: color 0.25s ease !important;
+      box-shadow: none !important;
+    }
+
+    .segmented-control .segment-btn:hover {
+      color: #d4d4d8 !important;
+    }
+
+    .segmented-control .segment-btn.active {
+      color: #ffffff !important;
+    }
+
+    .segmented-control .segment-btn.active::after {
+      content: '' !important;
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: -1px !important;
+      height: 2.5px !important;
+      background: var(--red-primary, #ff1e27) !important;
+      border-radius: 2px !important;
+      box-shadow: 0 0 12px rgba(255, 30, 39, 0.75) !important;
+    }
+
+    @media (max-width: 480px) {
+      .segmented-control {
+        gap: 18px !important;
+      }
+
+      .segmented-control .segment-btn {
+        font-size: 0.72rem !important;
+        letter-spacing: 0.08em !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- HERO CINEMÁTICO 3D CON ONDA EXPANSIVA Y LÁSER -->
+  <!-- HERO CINEMÁTICO 3D -->
   <section class="hero-ultra" id="heroSection">
     <div class="hero-ambient-light"></div>
     <div class="hero-grid-bg"></div>
@@ -61,7 +125,7 @@
     </div>
   </section>
 
-  <!-- CINTA DE TEXTO RODANTE MINIMALISTA -->
+  <!-- CINTA DE TEXTO RODANTE -->
   <div class="marquee-strip" aria-label="Texto animado de la marca">
     <div class="marquee-track">
       <div class="marquee-content">
@@ -69,7 +133,7 @@
         <span class="marquee-dot">✦</span>
         <span class="highlight">URBAN MEX</span>
         <span class="marquee-dot">✦</span>
-        <span>CAMISAS EXCLUSIVAS</span>
+        <span>PRENDAS EXCLUSIVAS</span>
         <span class="marquee-dot">✦</span>
         <span class="highlight">ESTILO URBANO</span>
         <span class="marquee-dot">✦</span>
@@ -81,7 +145,7 @@
         <span class="marquee-dot">✦</span>
         <span class="highlight">URBAN MEX</span>
         <span class="marquee-dot">✦</span>
-        <span>CAMISAS EXCLUSIVAS</span>
+        <span>PRENDAS EXCLUSIVAS</span>
         <span class="marquee-dot">✦</span>
         <span class="highlight">ESTILO URBANO</span>
         <span class="marquee-dot">✦</span>
@@ -96,7 +160,8 @@
     <div class="container">
       <div class="minimal-nav-wrapper">
 
-        <div class="segmented-control" role="tablist" aria-label="Categoría de camisas">
+        <!-- Apartados dinámicos con el estilo original -->
+        <div class="segmented-control" id="segmentedControl" role="tablist" aria-label="Apartados del catálogo">
           <button type="button" class="segment-btn active" data-category="brand" role="tab" aria-selected="true">
             <span>Por Marca</span>
           </button>
@@ -121,8 +186,8 @@
         <div class="custom-banner" id="customBanner" style="display:none;">
           <div class="custom-banner-inner">
             <span class="custom-dot"></span>
-            <p><strong>Diseños a tu medida:</strong> Estampamos tu propio arte o idea. Toca cualquier modelo para
-              cotizar por WhatsApp.</p>
+            <p id="customBannerText"><strong>Diseños a tu medida:</strong> Estampamos tu propio arte o idea. Toca
+              cualquier modelo para cotizar por WhatsApp.</p>
           </div>
         </div>
 
@@ -130,7 +195,7 @@
     </div>
   </section>
 
-  <!-- CATÁLOGO DE CAMISAS -->
+  <!-- CATÁLOGO -->
   <main class="catalog-section">
     <div class="container">
       <div class="products-grid" id="productsGrid"></div>
@@ -178,7 +243,7 @@
     </div>
   </div>
 
-  <!-- CIERRE DE PÁGINA & FOOTER -->
+  <!-- FOOTER (SIN ENGRANAJE DE ACCESO AL PANEL) -->
   <footer class="site-footer-new">
     <div class="footer-glow-line"></div>
     <div class="container">
@@ -211,7 +276,6 @@
             </svg>
             <span>Subir</span>
           </a>
-          <a href="admin.html" class="footer-admin-link" title="Panel">⚙</a>
         </div>
       </div>
 

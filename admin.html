@@ -113,12 +113,15 @@
       <div>
         <h1 style="font-size:1.3rem; font-weight:800; color:var(--text-main); letter-spacing:-0.02em;">Administración
         </h1>
-        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Gestiona camisas, marcas y configuración
-          de la tienda.</p>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Gestiona productos, apartados, marcas y
+          configuración.</p>
       </div>
       <div style="display:flex; gap:6px; flex-wrap:wrap;">
         <span class="stat-pill">
-          <span id="statProductsCount">0</span> camisas
+          <span id="statProductsCount">0</span> productos
+        </span>
+        <span class="stat-pill">
+          <span id="statCategoriesCount">2</span> apartados
         </span>
         <span class="stat-pill">
           <span id="statBrandsCount">0</span> marcas
@@ -129,7 +132,10 @@
     <!-- Tabs de Navegación -->
     <nav class="admin-nav-tabs" role="tablist">
       <button type="button" class="admin-tab-btn active" data-tab="tabProducts" role="tab" aria-selected="true">
-        Camisas
+        Productos
+      </button>
+      <button type="button" class="admin-tab-btn" data-tab="tabCategories" role="tab" aria-selected="false">
+        Apartados
       </button>
       <button type="button" class="admin-tab-btn" data-tab="tabBrands" role="tab" aria-selected="false">
         Marcas
@@ -139,12 +145,12 @@
       </button>
     </nav>
 
-    <!-- TAB 1: CAMISAS -->
+    <!-- TAB 1: PRODUCTOS -->
     <section id="tabProducts" class="admin-tab-content">
 
       <div class="admin-card" id="formCard">
         <div class="admin-card-header">
-          <h2 class="admin-card-title" id="formTitle">Subir Camisa</h2>
+          <h2 class="admin-card-title" id="formTitle">Subir Producto</h2>
           <button type="button" class="btn btn-secondary btn-sm" id="btnCancelEdit" style="display:none;">
             Cancelar
           </button>
@@ -154,16 +160,13 @@
           <input type="hidden" id="editProductId" value="">
 
           <div class="form-group">
-            <label class="form-label">Tipo de camisa:</label>
-            <div class="radio-toggle-group">
-              <div class="radio-toggle-item">
-                <input type="radio" id="typeBrand" name="productType" value="brand" checked>
-                <label for="typeBrand">Por Marca</label>
-              </div>
-              <div class="radio-toggle-item">
-                <input type="radio" id="typeCustom" name="productType" value="custom">
-                <label for="typeCustom">Personalizada</label>
-              </div>
+            <label class="form-label" for="productCategory">Apartado del Catálogo:</label>
+            <div style="display:flex; gap:8px;">
+              <select id="productCategory" class="form-control" style="flex:1;"></select>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnQuickAddCategory"
+                style="white-space:nowrap;">
+                + Apartado
+              </button>
             </div>
           </div>
 
@@ -180,7 +183,8 @@
           <div class="form-row two-cols">
             <div class="form-group">
               <label class="form-label" for="productName">Nombre *</label>
-              <input type="text" id="productName" class="form-control" placeholder="Ej. Camisa 8" required>
+              <input type="text" id="productName" class="form-control" placeholder="Ej. Gorra New Era / Camisa 8"
+                required>
             </div>
 
             <div class="form-group">
@@ -199,7 +203,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Foto de la Camisa <small>(Opcional — si lo dejas vacío dirá "Sin
+            <label class="form-label">Foto del Producto <small>(Opcional — si lo dejas vacío dirá "Sin
                 imagen")</small>:</label>
 
             <div class="upload-dropzone" id="dropzoneBox">
@@ -239,7 +243,7 @@
 
           <div style="display:flex; gap:8px; margin-top:18px;">
             <button type="submit" class="btn btn-primary" id="btnSubmitProduct" style="flex:1;">
-              Guardar Camisa
+              Guardar Producto
             </button>
             <button type="button" class="btn btn-secondary" id="btnResetForm">
               Limpiar
@@ -255,12 +259,10 @@
         </div>
 
         <div style="margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap;">
-          <input type="text" id="adminSearchInput" class="form-control" placeholder="Buscar camisa..."
+          <input type="text" id="adminSearchInput" class="form-control" placeholder="Buscar producto..."
             style="flex:1; min-width:160px;">
           <select id="adminFilterType" class="form-control" style="width:auto;">
-            <option value="all">Todas</option>
-            <option value="brand">Por Marca</option>
-            <option value="custom">Personalizadas</option>
+            <option value="all">Todos los apartados</option>
           </select>
         </div>
 
@@ -268,7 +270,40 @@
       </div>
     </section>
 
-    <!-- TAB 2: MARCAS -->
+    <!-- TAB 2: APARTADOS (GORRAS, PANTALONES, CAMISAS, ETC.) -->
+    <section id="tabCategories" class="admin-tab-content" style="display:none;">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">Apartados del Menú Principal</h2>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:14px;">
+          Crea secciones nuevas o cambia el nombre de las existentes. Se mostrarán arriba con el mismo estilo que
+          <strong>Por Marca</strong> y <strong>Personalizadas</strong>.
+        </p>
+
+        <form id="categoryForm" style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="newCategoryName" class="form-control"
+              placeholder="Nombre del apartado (ej. Gorras, Pantalones)" required style="flex:1;">
+            <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
+              + Crear Apartado
+            </button>
+          </div>
+          <label
+            style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--text-secondary); cursor:pointer;">
+            <input type="checkbox" id="newCategoryHasBrands"
+              style="accent-color:var(--red-primary); width:16px; height:16px;">
+            <span>Permitir filtrar por marcas (Adidas, Nike, etc.) dentro de este apartado</span>
+          </label>
+          <input type="text" id="newCategoryBanner" class="form-control"
+            placeholder="Mensaje opcional arriba de este apartado (ej. Gorras exclusivas y ajustables)">
+        </form>
+
+        <div class="brand-manager-grid" id="adminCategoriesList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MARCAS -->
     <section id="tabBrands" class="admin-tab-content" style="display:none;">
       <div class="admin-card">
         <div class="admin-card-header">
@@ -287,7 +322,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: CONFIGURACIÓN -->
+    <!-- TAB 4: CONFIGURACIÓN -->
     <section id="tabSettings" class="admin-tab-content" style="display:none;">
       <div class="admin-card">
         <div class="admin-card-header">
@@ -337,7 +372,7 @@
           Restablecer Catálogo Inicial
         </h3>
         <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">
-          Restaura Camisa 1 a Camisa 7 con precios en S/ 0.00 y sin imágenes.
+          Restaura los apartados y productos por defecto.
         </p>
         <button type="button" class="btn btn-danger btn-sm" id="btnResetDefaults">
           Restablecer Catálogo
