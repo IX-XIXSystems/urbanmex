@@ -186,8 +186,268 @@
         <div class="custom-banner" id="customBanner" style="display:none;">
           <div class="custom-banner-inner">
             <span class="custom-dot"></span>
-            <p id="customBannerText"><strong>Diseños a tu medida:</strong> Estampamos tu propio arte o idea. Toca
-              cualquier modelo para cotizar por WhatsApp.</p>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description"
+    content="URBAN MEX — Te lo hacen realidad. Catálogo exclusivo por marca, personalizados y accesorios.">
+  <meta name="theme-color" content="#040406">
+  <title>URBAN MEX | Te Lo Hacen Realidad</title>
+
+  <!-- BANNER PARA WHATSAPP -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ix-xixsystems.github.io/urbanmex/">
+  <meta property="og:site_name" content="URBAN MEX">
+  <meta property="og:title" content="URBAN MEX | Te Lo Hacen Realidad">
+  <meta property="og:description" content="Catálogo oficial por marca y diseños personalizados a tu medida.">
+  <meta property="og:image" content="https://ix-xixsystems.github.io/urbanmex/banner.jpeg">
+  <meta property="og:image:secure_url" content="https://ix-xixsystems.github.io/urbanmex/banner.jpeg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="URBAN MEX | Te Lo Hacen Realidad">
+  <meta name="twitter:description" content="Catálogo oficial por marca y diseños personalizados a tu medida.">
+  <meta name="twitter:image" content="https://ix-xixsystems.github.io/urbanmex/banner.jpeg">
+
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    .segmented-control {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      flex-wrap: wrap !important;
+      gap: 28px !important;
+      width: 100% !important;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      border-radius: 0 !important;
+      padding: 0 12px !important;
+    }
+
+    .segmented-control .segment-btn {
+      position: relative !important;
+      flex: 0 0 auto !important;
+      width: auto !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 12px 4px !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.1em !important;
+      color: #71717a !important;
+      cursor: pointer !important;
+      transition: color 0.25s ease !important;
+      box-shadow: none !important;
+    }
+
+    .segmented-control .segment-btn:hover {
+      color: #d4d4d8 !important;
+    }
+
+    .segmented-control .segment-btn.active {
+      color: #ffffff !important;
+    }
+
+    .segmented-control .segment-btn.active::after {
+      content: '' !important;
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: -1px !important;
+      height: 2.5px !important;
+      background: var(--red-primary, #ff1e27) !important;
+      border-radius: 2px !important;
+      box-shadow: 0 0 12px rgba(255, 30, 39, 0.75) !important;
+    }
+
+    .brand-filters-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .products-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 18px !important;
+    }
+
+    @media (max-width: 960px) {
+      .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .segmented-control {
+        gap: 18px !important;
+      }
+      .segmented-control .segment-btn {
+        font-size: 0.72rem !important;
+        letter-spacing: 0.08em !important;
+      }
+      .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+      }
+    }
+
+    .product-card {
+      background: #0b0b0f !important;
+      border: 1px solid rgba(255, 255, 255, 0.07) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px) !important;
+      border-color: rgba(255, 30, 39, 0.35) !important;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55) !important;
+    }
+
+    .product-card .product-img-box {
+      position: relative !important;
+      width: 100% !important;
+      height: 240px !important;
+      background: #0b0b0f !important;
+      overflow: hidden !important;
+      cursor: pointer !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    @media (max-width: 640px) {
+      .product-card .product-img-box {
+        height: 195px !important;
+      }
+    }
+
+    .product-card .product-img-box img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+      transition: transform 0.35s ease !important;
+    }
+
+    .product-card:hover .product-img-box img {
+      transform: scale(1.04) !important;
+    }
+
+    .product-card .product-info {
+      padding: 14px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      flex: 1 !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO CINEMÁTICO 3D -->
+  <section class="hero-ultra" id="heroSection">
+    <div class="hero-ambient-light"></div>
+    <div class="hero-grid-bg"></div>
+    <div class="hero-spotlight"></div>
+
+    <div class="hero-content">
+      <div class="hero-logo-wrap" id="heroLogoContainer">
+        <div class="logo-shockwave"></div>
+        <div class="logo-shockwave delay-1"></div>
+        <div class="logo-aura"></div>
+        <div class="logo-cyber-ring"></div>
+        <img src="assets/logo.png" alt="URBAN MEX — Te lo hacen realidad" class="hero-logo-img" id="mainHeroLogo"
+          draggable="false">
+      </div>
+    </div>
+  </section>
+
+  <!-- CINTA DE TEXTO RODANTE -->
+  <div class="marquee-strip" aria-label="Texto animado de la marca">
+    <div class="marquee-track">
+      <div class="marquee-content">
+        <span>TE LO HACEN REALIDAD</span>
+        <span class="marquee-dot">✦</span>
+        <span class="highlight">URBAN MEX</span>
+        <span class="marquee-dot">✦</span>
+        <span>PRENDAS EXCLUSIVAS</span>
+        <span class="marquee-dot">✦</span>
+        <span class="highlight">ESTILO URBANO</span>
+        <span class="marquee-dot">✦</span>
+        <span>DISEÑOS PERSONALIZADOS</span>
+        <span class="marquee-dot">✦</span>
+      </div>
+      <div class="marquee-content" aria-hidden="true">
+        <span>TE LO HACEN REALIDAD</span>
+        <span class="marquee-dot">✦</span>
+        <span class="highlight">URBAN MEX</span>
+        <span class="marquee-dot">✦</span>
+        <span>PRENDAS EXCLUSIVAS</span>
+        <span class="marquee-dot">✦</span>
+        <span class="highlight">ESTILO URBANO</span>
+        <span class="marquee-dot">✦</span>
+        <span>DISEÑOS PERSONALIZADOS</span>
+        <span class="marquee-dot">✦</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN Y FILTROS -->
+  <section class="control-deck-section">
+    <div class="container">
+      <div class="minimal-nav-wrapper">
+
+        <div class="segmented-control" id="segmentedControl" role="tablist" aria-label="Apartados del catálogo">
+          <button type="button" class="segment-btn active" data-category="brand" role="tab" aria-selected="true">
+            <span>Por Marca</span>
+          </button>
+          <button type="button" class="segment-btn" data-category="custom" role="tab" aria-selected="false">
+            <span>Personalizadas</span>
+          </button>
+        </div>
+
+        <div class="search-bar-unified">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input type="search" id="searchInput" class="search-input-clean" placeholder="Buscar modelo, talla o marca..."
+            autocomplete="off">
+          <span class="count-inline-badge" id="catalogCount" aria-live="polite">Cargando...</span>
+        </div>
+
+        <div class="brand-filters-wrapper" id="brandFiltersWrapper"></div>
+
+        <div class="custom-banner" id="customBanner" style="display:none;">
+          <div class="custom-banner-inner">
+            <span class="custom-dot"></span>
+            <p id="customBannerText"><strong>Diseños a tu medida:</strong> Estampamos tu propio arte o idea. Toca cualquier modelo para cotizar por WhatsApp.</p>
           </div>
         </div>
 
@@ -211,11 +471,9 @@
         </svg>
       </button>
 
-      <div class="modal-img-wrap" id="modalImgWrap">
-        <img id="modalImg" src="" alt="">
-      </div>
+      <div class="modal-img-wrap" id="modalImgWrap"></div>
 
-      <div style="margin-bottom:8px;">
+      <div style="margin-bottom:8px; margin-top:12px;">
         <span class="badge-brand" id="modalBrandBadge">Marca</span>
       </div>
 
@@ -243,7 +501,7 @@
     </div>
   </div>
 
-  <!-- FOOTER (SIN ENGRANAJE DE ACCESO AL PANEL) -->
+  <!-- FOOTER (SIN ENGRANAJE) -->
   <footer class="site-footer-new">
     <div class="footer-glow-line"></div>
     <div class="container">
@@ -286,32 +544,290 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  <!-- Scripts -->
-  <script src="js/store.js"></script>
-  <script src="js/app.js"></script>
   <script>
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-    const logoWrap = document.getElementById('heroLogoContainer');
-    if (logoWrap && window.matchMedia('(pointer: fine)').matches) {
-      let raf;
-      logoWrap.addEventListener('mousemove', (e) => {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          const r = logoWrap.getBoundingClientRect();
-          const x = (e.clientX - r.left - r.width / 2) / (r.width / 2);
-          const y = (e.clientY - r.top - r.height / 2) / (r.height / 2);
-          const tX = -(y * 14).toFixed(2);
-          const tY = (x * 14).toFixed(2);
-          logoWrap.style.transform = `perspective(1000px) rotateX(${tX}deg) rotateY(${tY}deg) scale3d(1.05, 1.05, 1.05)`;
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMgZ-4QTGUfthjyvdwy8HGf9bXV2Kb1uk",
+      authDomain: "urbanmex.firebaseapp.com",
+      databaseURL: "https://urbanmex-default-rtdb.firebaseio.com",
+      projectId: "urbanmex",
+      storageBucket: "urbanmex.firebasestorage.app",
+      messagingSenderId: "960274209417",
+      appId: "1:960274209417:web:faff9ae40b7614d0de0458"
+    };
+
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = typeof firebase !== 'undefined' ? firebase.database() : null;
+
+    const DEFAULT_WHATSAPP = '51931986950';
+
+    let state = {
+      settings: {
+        storeName: 'URBAN MEX',
+        tagline: 'Te lo hacen realidad!',
+        whatsapp: DEFAULT_WHATSAPP,
+        currency: 'S/ '
+      },
+      categories: [
+        { id: 'brand', name: 'Por Marca', hasBrands: true, banner: '' },
+        { id: 'custom', name: 'Personalizadas', hasBrands: false, banner: 'Diseños a tu medida: Estampamos tu propio arte o idea. Toca cualquier modelo para cotizar por WhatsApp.' }
+      ],
+      brands: ['Adidas', 'Nike', 'Supreme', 'Jordan'],
+      products: [
+        { id: 'prod_1', name: 'Camisa 1', brand: 'Personalizada', category: 'custom', price: 0, description: 'Tallas: S, M, L, XL, XXL • Algodón 240g heavy drop.', image: '' },
+        { id: 'prod_2', name: 'Camisa 2', brand: 'Adidas', category: 'brand', price: 0, description: 'Tallas: S, M, L, XL • 100% Algodón peinado negro • Ajuste regular fit.', image: '' },
+        { id: 'prod_3', name: 'Camisa 3', brand: 'Nike', category: 'brand', price: 0, description: 'Tallas: S, M, L, XL • Algodón Dri-FIT 220 GSM.', image: '' },
+        { id: 'prod_4', name: 'Camisa 4', brand: 'Adidas', category: 'brand', price: 0, description: 'Tallas: M, L, XL • Microfibra deportiva ultra ligera.', image: '' },
+        { id: 'prod_5', name: 'Camisa 5', brand: 'Nike', category: 'brand', price: 0, description: 'Tallas: S, M, L, XL, XXL • Algodón estructurado 240 GSM.', image: '' },
+        { id: 'prod_6', name: 'Camisa 6', brand: 'Personalizada', category: 'custom', price: 0, description: 'Tallas: M, L, XL • Personalizable con tu diseño a pedido.', image: '' },
+        { id: 'prod_7', name: 'Camisa 7', brand: 'Personalizada', category: 'custom', price: 0, description: 'Tallas: S, M, L, XL • 100% algodón peinado negro 240g.', image: '' }
+      ],
+      activeCategory: 'brand',
+      activeBrand: 'all',
+      searchQuery: '',
+      currentModalProduct: null
+    };
+
+    function normalizePhone(raw) {
+      let digits = String(raw || '').replace(/[^0-9]/g, '');
+      if (digits.length === 9 && digits.startsWith('9')) digits = '51' + digits;
+      return digits || DEFAULT_WHATSAPP;
+    }
+
+    function formatPrice(price) {
+      const val = parseFloat(price);
+      const safeVal = !isNaN(val) && val >= 0 ? val : 0;
+      return `${state.settings.currency || 'S/ '}${safeVal.toFixed(2)}`;
+    }
+
+    function getCategoryById(id) {
+      return state.categories.find(c => c.id === id) || null;
+    }
+
+    function getWhatsAppLink(product) {
+      const phone = normalizePhone(state.settings.whatsapp);
+      const catObj = getCategoryById(product.category);
+      const brandText = (catObj && catObj.hasBrands) ? product.brand : (catObj ? catObj.name : product.brand);
+      const message = `🔥 ¡Hola *${state.settings.storeName}*! Me interesa pedir este producto del catálogo:\n\n🛍️ *${product.name}*\n🏷️ *Apartado/Marca:* ${brandText}\n💰 *Precio:* ${formatPrice(product.price)}\n📝 *Detalles:* ${product.description || 'Consultar disponibilidad'}\n\n¿Tienen disponibilidad para coordinar el pedido?`;
+      return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    }
+
+    function renderAll() {
+      document.querySelectorAll('.dynamic-store-name').forEach(el => el.textContent = state.settings.storeName || 'URBAN MEX');
+      const taglineEl = document.getElementById('dynamicTagline');
+      if (taglineEl) taglineEl.textContent = `✦ ${state.settings.tagline || 'Te lo hacen realidad!'}`;
+
+      // Apartados
+      if (!state.categories.some(c => c.id === state.activeCategory)) {
+        state.activeCategory = state.categories[0] ? state.categories[0].id : 'brand';
+      }
+      const segCtrl = document.getElementById('segmentedControl');
+      segCtrl.innerHTML = state.categories.map(cat => `
+        <button type="button" class="segment-btn ${cat.id === state.activeCategory ? 'active' : ''}" data-category="${cat.id}">
+          <span>${cat.name}</span>
+        </button>
+      `).join('');
+
+      segCtrl.querySelectorAll('.segment-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activeCategory = btn.getAttribute('data-category');
+          state.activeBrand = 'all';
+          renderAll();
         });
       });
 
-      logoWrap.addEventListener('mouseleave', () => {
-        cancelAnimationFrame(raf);
-        logoWrap.style.transform = '';
+      // Filtros de Marca o Banner
+      const catObj = getCategoryById(state.activeCategory);
+      const brandWrap = document.getElementById('brandFiltersWrapper');
+      const customBanner = document.getElementById('customBanner');
+      const customBannerText = document.getElementById('customBannerText');
+
+      if (!catObj || !catObj.hasBrands) {
+        brandWrap.style.display = 'none';
+        if (catObj && catObj.banner) {
+          customBanner.style.display = 'block';
+          customBannerText.innerHTML = catObj.banner;
+        } else {
+          customBanner.style.display = 'none';
+        }
+      } else {
+        customBanner.style.display = 'none';
+        brandWrap.style.display = 'flex';
+        const catProds = state.products.filter(p => p.category === state.activeCategory);
+        const pills = [
+          { id: 'all', label: 'Todas', count: catProds.length },
+          ...state.brands.map(b => ({
+            id: b,
+            label: b,
+            count: catProds.filter(p => (p.brand || '').toLowerCase() === b.toLowerCase()).length
+          }))
+        ];
+        brandWrap.innerHTML = pills.map(pill => {
+          const isAct = state.activeBrand.toLowerCase() === pill.id.toLowerCase();
+          return `
+            <button type="button" class="brand-chip" data-brand="${pill.id}"
+              style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:10px; font-size:0.76rem; font-weight:700; cursor:pointer; border:1px solid ${isAct ? '#ffffff' : 'rgba(255,255,255,0.08)'}; background:${isAct ? '#ffffff' : 'rgba(255,255,255,0.04)'}; color:${isAct ? '#050507' : '#a1a1aa'}; transition:all 0.2s;">
+              <span>${pill.label}</span>
+              <span style="font-size:0.68rem; opacity:0.7;">${pill.count}</span>
+            </button>
+          `;
+        }).join('');
+
+        brandWrap.querySelectorAll('.brand-chip').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.activeBrand = btn.getAttribute('data-brand');
+            renderAll();
+          });
+        });
+      }
+
+      // Productos
+      let filtered = state.products.filter(p => p.category === state.activeCategory);
+      if (catObj && catObj.hasBrands && state.activeBrand !== 'all') {
+        filtered = filtered.filter(p => (p.brand || '').toLowerCase() === state.activeBrand.toLowerCase());
+      }
+      if (state.searchQuery.trim() !== '') {
+        const q = state.searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(p =>
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.brand || '').toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q)
+        );
+      }
+
+      document.getElementById('catalogCount').textContent = `${filtered.length} ${filtered.length === 1 ? 'MODELO' : 'MODELOS'}`;
+      const grid = document.getElementById('productsGrid');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:48px 20px; background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); border-radius:16px;">
+            <p style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:6px;">No hay modelos en este apartado todavía</p>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Pronto subiremos nuevos diseños.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(prod => {
+        const hasImage = prod.image && prod.image.trim() !== '';
+        const badgeLabel = (catObj && catObj.hasBrands) ? (prod.brand || 'Marca') : (catObj ? catObj.name : prod.brand);
+        const mediaHtml = hasImage
+          ? `<img src="${prod.image}" alt="${prod.name}" loading="lazy" onerror="this.outerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0b0b0f;color:#52525b;font-size:0.74rem;font-weight:700;letter-spacing:0.2em;\\'>SIN IMAGEN</div>'">`
+          : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#0b0b0f; color:#52525b; font-size:0.74rem; font-weight:700; letter-spacing:0.2em; user-select:none;">SIN IMAGEN</div>`;
+
+        return `
+          <article class="product-card" data-id="${prod.id}">
+            <div class="product-img-box">
+              <span class="badge-brand" style="position:absolute; top:10px; left:10px; z-index:2; text-transform:uppercase;">${badgeLabel}</span>
+              ${mediaHtml}
+            </div>
+            <div class="product-info">
+              <div>
+                <h3 class="product-title" style="font-size:0.95rem; font-weight:800; color:var(--text-main); cursor:pointer; margin-bottom:4px;">${prod.name}</h3>
+                <p class="product-desc" style="font-size:0.76rem; color:var(--text-secondary); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${prod.description || ''}</p>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+                <span class="product-price" style="font-weight:800; font-size:0.98rem; color:var(--text-main);">${formatPrice(prod.price)}</span>
+                <a href="${getWhatsAppLink(prod)}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp" style="padding:7px 11px; font-size:0.75rem;">
+                  <span>Pedir</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.product-card').forEach(card => {
+        const id = card.getAttribute('data-id');
+        card.querySelector('.product-img-box').addEventListener('click', () => openModal(id));
+        card.querySelector('.product-title').addEventListener('click', () => openModal(id));
       });
     }
+
+    function openModal(id) {
+      const prod = state.products.find(p => p.id === id);
+      if (!prod) return;
+      state.currentModalProduct = prod;
+
+      const catObj = getCategoryById(prod.category);
+      const badgeLabel = (catObj && catObj.hasBrands) ? (prod.brand || 'Marca') : (catObj ? catObj.name : prod.brand);
+      const hasImage = prod.image && prod.image.trim() !== '';
+
+      const modalImgWrap = document.getElementById('modalImgWrap');
+      modalImgWrap.innerHTML = hasImage
+        ? `<img src="${prod.image}" alt="${prod.name}" style="width:100%; height:280px; object-fit:contain; background:#08080c; border-radius:12px; display:block;" onerror="this.outerHTML='<div style=\\'width:100%;height:220px;display:flex;align-items:center;justify-content:center;background:#0b0b0f;color:#52525b;font-size:0.82rem;font-weight:700;letter-spacing:0.22em;border-radius:12px;\\'>SIN IMAGEN</div>'">`
+        : `<div style="width:100%; height:220px; display:flex; align-items:center; justify-content:center; background:#0b0b0f; color:#52525b; font-size:0.82rem; font-weight:700; letter-spacing:0.22em; border-radius:12px; border:1px solid rgba(255,255,255,0.06);">SIN IMAGEN</div>`;
+
+      document.getElementById('modalBrandBadge').textContent = badgeLabel;
+      document.getElementById('modalTitle').textContent = prod.name;
+      document.getElementById('modalDesc').textContent = prod.description || 'Consulta tallas y disponibilidad por WhatsApp.';
+      document.getElementById('modalPrice').textContent = formatPrice(prod.price);
+      document.getElementById('modalWaBtn').href = getWhatsAppLink(prod);
+
+      document.getElementById('productModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('productModal').classList.remove('active');
+      document.body.style.overflow = '';
+      state.currentModalProduct = null;
+    }
+
+    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+    document.getElementById('productModal').addEventListener('click', (e) => {
+      if (e.target.id === 'productModal') closeModal();
+    });
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      state.searchQuery = e.target.value;
+      renderAll();
+    });
+
+    // Sincronización en tiempo real con Firebase
+    if (db) {
+      db.ref('urbanmex/settings').on('value', (snap) => {
+        const val = snap.val();
+        if (val) {
+          const oldPlaceholders = ['51900000000', '521000000000', ''];
+          const clean = String(val.whatsapp || '').replace(/[^0-9]/g, '');
+          state.settings = {
+            ...state.settings,
+            ...val,
+            whatsapp: oldPlaceholders.includes(clean) ? DEFAULT_WHATSAPP : normalizePhone(clean)
+          };
+          renderAll();
+        }
+      });
+
+      db.ref('urbanmex/categories').on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val) && val.length > 0) {
+          state.categories = val;
+          renderAll();
+        }
+      });
+
+      db.ref('urbanmex/brands').on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val)) {
+          state.brands = val;
+          renderAll();
+        }
+      });
+
+      db.ref('urbanmex/products').on('value', (snap) => {
+        const val = snap.val();
+        if (val !== null) {
+          state.products = Array.isArray(val) ? val.filter(Boolean) : Object.values(val);
+          renderAll();
+        }
+      });
+    }
+
+    renderAll();
   </script>
 </body>
 
